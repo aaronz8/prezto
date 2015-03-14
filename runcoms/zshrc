@@ -11,3 +11,43 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
 fi
 
 # Customize to your needs...
+
+function runTests(){
+  CT_ARGS="-suite $1 -repeat $2 -case $3" COVER=1 ./tests.sh "$4"
+}
+source $HOME/.cargo/env
+GITLAB_PRIVATE_TOKEN="" # https://git.whisper.sh/profile/account
+export SLACK_CLI_TOKEN="" # https://api.slack.com/custom-integrations/legacy-tokens
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# --files: List files that would be searched but do not search
+# --no-ignore: Do not respect .gitignore, etc...
+# --hidden: Search hidden files and folders
+# --follow: Follow symlinks
+# --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+
+alias v=nvim
+alias vim=nvim
+export PATH="/usr/local/opt/erlang@18/bin:$PATH"
+
+alias build-deploy='GITLAB_PRIVATE_TOKEN=$GITLAB_PRIVATE_TOKEN python bin/gitlab.py --project_name=server --labels="Stat: Deployed" --deploy_branch=allie.deploy; git push origin allie.deploy --force'
+
+function deploy(){
+  app=${1:-'website'}
+  target=${2:-'header-christian-03'}
+  branch=${3:-$(git rev-parse --abbrev-ref HEAD)}
+  echo "app: $app"
+  echo "target: $target"
+  echo "branch: $branch"
+  cmd="slack chat send \"deploy $app $branch to $target\" @jarvis"
+  echo $cmd
+  echo -n "cancel within "
+  for i in {5..1};do echo -n "$i." && sleep 1; done
+  eval $cmd
+}
+
+alias retry='until $(fc -ln -1); do sleep 1; done'
+
+alias server='python3 -m http.server'
