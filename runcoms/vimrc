@@ -1,0 +1,180 @@
+set nocompatible
+filetype off
+
+"auto-install vim-plug
+if empty(glob("~/.vim/autoload/plug.vim"))
+    execute '!curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.github.com/junegunn/vim-plug/master/plug.vim'
+    autocmd VimEnter * PlugInstall
+endif
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-dispatch'
+Plug 'bling/vim-airline'
+Plug 'rking/ag.vim'
+Plug 'airblade/vim-gitgutter'
+Plug 'http://github.com/kien/ctrlp.vim'
+Plug 'scrooloose/syntastic'
+Plug 'scrooloose/nerdtree'
+Plug 'jistr/vim-nerdtree-tabs'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
+Plug 'elixir-lang/vim-elixir'
+Plug 'crusoexia/vim-monokai'
+Plug 'lambdatoast/elm.vim', { 'for': 'elm' }
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/rainbow_parentheses.vim'
+Plug 'kchmck/vim-coffee-script'
+
+call plug#end()
+
+set incsearch
+set shiftwidth=2
+set expandtab
+set autoindent
+set softtabstop=2
+if !has('nvim')
+  set ttymouse=xterm2
+endif
+set mouse=a
+
+colorscheme monokai
+let g:rehash256 = 1
+
+"Highlighting
+syntax on
+set hlsearch
+" Line Numbers
+set nu
+" Ignore case when searching unless search string contains upper case
+"set ignorecase
+"set smartcase
+set laststatus=2
+set ruler
+set rulerformat=%25([%{&fileformat}]%14(%l,%c%V%)%=%4P%)
+
+set backspace=2
+set hidden
+
+"Indent
+set cindent
+set cinoptions=(0
+
+"Indent colors
+set background=dark
+
+"folding
+set foldmethod=syntax
+set foldlevelstart=1
+
+let javaScript_fold=1         " JavaScript
+let perl_fold=1               " Perl
+let php_folding=1             " PHP
+let r_syntax_folding=1        " R
+let ruby_fold=1               " Ruby
+let sh_fold_enabled=1         " sh
+let vimsyn_folding='af'       " Vim script
+let xml_syntax_folding=1      " XML
+
+" Automatic formatting
+autocmd BufWritePre *.rb :%s/\s\+$//e
+autocmd BufWritePre *.go :%s/\s\+$//e
+autocmd BufWritePre *.haml :%s/\s\+$//e
+autocmd BufWritePre *.html :%s/\s\+$//e
+autocmd BufWritePre *.scss :%s/\s\+$//e
+autocmd BufWritePre *.slim :%s/\s\+$//e
+
+" format the entire file
+nmap <leader>fef ggVG=
+
+" Search setup
+nnoremap <silent> <F4> :call <SID>SearchMode()<CR>
+function s:SearchMode()
+  if !exists('s:searchmode') || s:searchmode == 0
+    echo 'Search next: scroll hit to middle if not on same page'
+    nnoremap <silent> n n:call <SID>MaybeMiddle()<CR>
+    nnoremap <silent> N N:call <SID>MaybeMiddle()<CR>
+    let s:searchmode = 1
+  elseif s:searchmode == 1
+    echo 'Search next: scroll hit to middle'
+    nnoremap n nzz
+    nnoremap N Nzz
+    let s:searchmode = 2
+  else
+    echo 'Search next: normal'
+    nunmap n
+    nunmap N
+    let s:searchmode = 0
+  endif
+endfunction
+
+" If cursor is in first or last line of window, scroll to middle line.
+function s:MaybeMiddle()
+  if winline() == 1 || winline() == winheight(0)
+    normal! zz
+  endif
+endfunction
+
+" CtrlP
+let g:ctrlp_working_path_mode = 'ra'
+" let g:ctrlp_by_filename = 1
+" let g:ctrlp_max_files = 1000
+" let g:ctrlp_max_depth = 5
+let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+
+" NERDTree
+autocmd vimenter * NERDTree
+autocmd vimenter * wincmd p
+nmap <leader>n :NERDTreeToggle<CR>
+let NERDTreeHighlightCursorline=1
+
+" NERDTree enable for 'vim' and 'vim .'
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+" Vim exit if NERDTree is last window
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+
+" Syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+let g:syntastic_javascript_checkers = ['eslint']
+
+" Git shortcuts
+nnoremap <space>gb :Git branch<Space>
+nnoremap <space>gc :Git commit --verbose<CR>
+nnoremap <space>gca :Git commit --verbose --all<CR>
+nnoremap <space>gco :Git checkout<Space>
+nnoremap <space>gfm :Dispatch! git pull<CR>
+nnoremap <space>gg :Ggrep<Space>
+nnoremap <space>gm :Git merge<Space>
+nnoremap <space>gwS :Gstatus<CR>
+nnoremap <space>gd :Gdiff<CR>
+
+"Create :Find command for fzf and rg
+" --column: Show column number
+" --line-number: Show line number
+" --no-heading: Do not show file headings in results
+" --fixed-strings: Search term as a literal string
+" --ignore-case: Case insensitive search
+" --no-ignore: Do not respect .gitignore, etc...
+" --hidden: Search hidden files and folders
+" --follow: Follow symlinks
+" --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+" --color: Search color options
+command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
+
+"use ripgrep for grepprg
+set grepprg=rg\ --vimgrep
