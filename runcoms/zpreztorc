@@ -46,7 +46,10 @@ zstyle ':prezto:load' pmodule \
   'homebrew' \
   'node' \
   'syntax-highlighting' \
-  'autosuggestions'
+  'autosuggestions' \
+  'fzf' \
+  'more-completions' \
+  'kubectl'
 
 #
 # Autosuggestions
