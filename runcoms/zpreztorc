@@ -51,7 +51,8 @@ zstyle ':prezto:load' pmodule \
   'more-completions' \
   'kubectl' \
   'poetry' \
-  'helmfile'
+  'helmfile' \
+  'exa'
 
 #
 # Autosuggestions

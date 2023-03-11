@@ -32,3 +32,6 @@
 [submodule "contrib/fzf"]
 	path = contrib/fzf
 	url = https://github.com/lildude/fzf-prezto
+[submodule "contrib/exa"]
+	path = contrib/exa
+	url = https://github.com/zap-zsh/exa.git
