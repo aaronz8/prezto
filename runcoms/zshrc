@@ -3,7 +3,6 @@
 #
 # Authors:
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
-#
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
@@ -11,3 +10,82 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
 fi
 
 # Customize to your needs...
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc' ]; then source '/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc' ]; then source '/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc'; fi
+
+alias qr="qrencode -o - -t ANSI"
+
+# golang
+export PATH=$PATH:$(go env GOPATH)/bin
+export GOPRIVATE="github.com/blep-ai,github.com/azhang,github.com/trylotus"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!wjo
+__conda_setup="$('/usr/local/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/usr/local/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/usr/local/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/usr/local/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+export PATH="/usr/local/opt/curl/bin:$PATH"
+
+# other aliases
+alias vim="nvim"
+alias vi="nvim"
+alias oldvim="vim"
+
+# fasd aliases
+alias f='fasd -f'
+alias v='f -e nvim'
+alias o='f -e open'
+
+alias icat='kitty +kitten icat'
+
+# multithreaded make (CPUs - 1) 
+if type nproc &>/dev/null; then   # GNU/Linux
+  export MAKEFLAGS="$MAKEFLAGS -j$(($(nproc)-1))"
+elif type sysctl -n hw.ncpu &>/dev/null; then   # macOS, FreeBSD
+  export MAKEFLAGS="$MAKEFLAGS -j$(($(sysctl -n hw.ncpu)-1))"
+fi
+
+
+alias beep='tput bel'
+
+
+alias blep-psql='MASTERPOD="$(kubectl get pod -o name --namespace timescaledb -l release=timescaledb,role=master)";kubectl exec -i --tty --namespace timescaledb ${MASTERPOD} -- psql'
+
+alias blep-mon='parallel -u ::: "kubectl port-forward service/prometheus-operated -n monitoring 9090" "kubectl port-forward -n monitoring service/prometheus-grafana 3000:80"'
+
+alias blep-traefik='open "http://localhost:9000/dashboard/#/" && kubectl port-forward ${$(kubectl get pods -n traefik --selector "app.kubernetes.io/name=traefik" --output=name)[1]} 9000:9000 --namespace=traefik'
+
+alias blep-timescale='RELEASE=timescaledb;kubectl get all,endpoints,pvc -l release=${RELEASE} -L role -n timescaledb'
+
+alias blep-goldilocks='open http://localhost:8080 && kubectl -n goldilocks port-forward svc/goldilocks-dashboard 8080:80'
+
+# docker exec -t your-db-container  pg_dumpall -c -U postgres | gzip > ./tmp/dump_$(date +"%Y-%m-%d_%H_%M_%S").gz
+#
+# For prometheus UI
+#kubectl port-forward service/prometheus-operated -n monitoring 9090
+#
+
+
+alias curltime="curl -w \"@$HOME/.curl-format.txt\" -o NUL -s "
+
+alias fin="mdfind -onlyin . -name "
+
+# https://stackoverflow.com/questions/39494631/gpg-failed-to-sign-the-data-fatal-failed-to-write-commit-object-git-2-10-0
+export GPG_TTY=$(tty) 
+. "$HOME/.cargo/env"
+
+export HOMEBREW_MAKE_JOBS=$(expr $(sysctl -n hw.ncpu) - 1)

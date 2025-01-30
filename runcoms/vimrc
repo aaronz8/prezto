@@ -44,7 +44,8 @@ Plug 'junegunn/goyo.vim'
 Plug 'junegunn/limelight.vim'
 Plug 'junegunn/vim-easy-align'
 
-Plug 'github/copilot.vim'
+"Plug 'github/copilot.vim'
+Plug 'Exafunction/codeium.vim', { 'branch': 'main' }
 
 "Plug 'ervandew/supertab' "replaced by coc.nvim
 "Plug 'jistr/vim-nerdtree-tabs' "deprecated
